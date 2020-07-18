@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../cssjs/lib/layui-v2.5.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="../cssjs/css/public.css" media="all">
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+
+        <blockquote class="layui-elem-quote layui-text">
+            给自己企业下增加用户
+        </blockquote>
+
+        <form class="layui-form" action="">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">用户名称</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="userName" lay-verify="title" autocomplete="off" placeholder="请输入用户名称"
+                               class="layui-input">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">用户手机</label>
+                    <div class="layui-input-inline">
+                        <input type="tel" name="mobile" lay-verify="required|phone" placeholder="请输入用户手机"
+                               autocomplete="off"
+                               class="layui-input">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">用户邮箱</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="email" autocomplete="off" placeholder="请输入用户邮箱" class="layui-input">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">用户密码</label>
+                    <div class="layui-input-inline">
+                        <input type="password" name="password" lay-verify="password" autocomplete="off"
+                               placeholder="请输入用户密码" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">用户性别</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="sex" value="1" title="男" checked="">
+                    <input type="radio" name="sex" value="0" title="女">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit="" lay-filter="openAccount">立即提交</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="../cssjs/lib/jquery-3.4.1/jquery-3.4.1.min.js" charset="utf-8"></script>
+<script src="../cssjs/lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+<script src="../cssjs/api/http.js" charset="utf-8"></script>
+<script src="../cssjs/loginJs/loginJS.js" charset="utf-8"></script>
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+<script>
+    layui.use(['form', 'layedit', 'laydate'], function () {
+        loginValida();
+        var form = layui.form
+            , layer = layui.layer;
+
+        //自定义验证规则
+        form.verify({
+            title: function (value) {
+                if (value.length > 6 || value.length < 1) {
+                    return '用户名称至少得1个字符，最大6个字符';
+                }
+            }
+            , password: [
+                /^[\S]{6,12}$/
+                , '密码必须6到12位，且不能出现空格'
+            ]
+        });
+        //监听提交
+        form.on('submit(openAccount)', function (data) {
+            var token = LocalData.getData("token");
+            var param = data.field;
+            param.token = token;
+            $.ajax({
+                url: $api + 'user/openAccount',
+                type: 'post',
+                dataType: 'json',
+                async: false,//同步提交。不设置则默认异步，异步的话，最后执行ajax
+                contentType: 'application/json',
+                data: JSON.stringify(param),
+                success: function (data) {
+                    if(data.code == 0){
+                        console.log(data);
+                        layer.msg(data.msg);
+                    }else {
+                        layer.msg(data.msg);
+                    }
+                }
+            })
+            return false;
+        });
+    });
+</script>
+
+</body>
+</html>

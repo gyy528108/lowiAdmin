@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../cssjs/lib/layui-v2.5.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="../cssjs/css/public.css" media="all">
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+
+        <fieldset class="table-search-fieldset">
+            <legend>搜索信息</legend>
+            <div style="margin: 10px 10px 10px 10px">
+                <form class="layui-form layui-form-pane" action="">
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">城市</label>
+                            <div class="layui-input-inline">
+                                <input id="cityName" type="text" name="classify" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <button type="submit" class="layui-btn layui-btn-primary" lay-submit
+                                    lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </fieldset>
+        <table class="layui-hide" id="currentTableId"></table>
+    </div>
+</div>
+<script src="../cssjs/lib/jquery-3.4.1/jquery-3.4.1.min.js" charset="utf-8"></script>
+<script src="../cssjs/lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+<script src="../cssjs/api/http.js" charset="utf-8"></script>
+<script src="../cssjs/loginJs/loginJS.js" charset="utf-8"></script>
+<script>
+    layui.use(['form', 'table'], function () {
+       loginValida();
+        var $ = layui.jquery,
+            form = layui.form,
+            table = layui.table;
+        let city = "杭州";
+        table.render({
+            elem: '#currentTableId',
+            id: "weatherTable",
+            url: "http://wthrcdn.etouch.cn/weather_mini",
+            toolbar: '#toolbarDemo',
+            defaultToolbar: ['filter', 'exports', 'print', {
+                title: '提示',
+                layEvent: 'LAYTABLE_TIPS',
+                icon: 'layui-icon-tips'
+            }],
+            where: {
+                city: city
+            },
+            parseData: function (res) {
+                if(res.status != 1000){
+                    return {
+                        "code": res.status, //解析接口状态
+                        "msg": res.desc //解析数据列表
+                    }
+                }
+                console.log("返回值", res);
+                var content = res.data.forecast;
+                let cityName = $("#cityName").val();
+                if (!cityName) {
+                    cityName = city;
+                }
+                for (let i = 0; i < content.length; i++) {
+                    var reg = ".[0-9]{1,}.*?\]";
+                    var str = content[i].fengli;
+                    var patt = new RegExp(reg, "g");
+                    var result = "";
+                    while ((result = patt.exec(str)) != null) {
+                        result = result[0];
+                        break;
+                    }
+                    content[i].fengxiang = content[i].fengxiang + "  " + result;
+                    content[i].city = cityName;
+                    content[i].wendu = res.data.wendu;
+                    content[i].ganmao = res.data.ganmao;
+                }
+
+                return {
+                    "code": 0, //解析接口状态
+                    "data": res.data.forecast //解析数据列表
+                }
+            },
+            cols: [
+                [
+                    {type: "checkbox", width: '2%'},
+                    {field: 'city', width: '10%', title: '城市', align: 'center'},
+                    {field: 'date', width: '15%', title: '时间', align: 'center'},
+                    {field: 'fengxiang', width: '10%', title: '风力', align: 'center'},
+                    {field: 'high', width: '10%', title: '最高温', align: 'center'},
+                    {field: 'low', width: '10%', title: '最低温', align: 'center'},
+                    {field: 'type', width: '10%', title: '天气', align: 'center'},
+                    {field: 'wendu', width: '8%', title: '当前温度', align: 'center'},
+                    {field: 'ganmao', width: '25%', title: '注意事项', align: 'center'},
+                ]
+            ],
+            done: function () {
+                alarmTableRowSpan('wendu', 1);
+                alarmTableRowSpan('ganmao', 1);
+            },
+            skin: 'line'
+        });
+
+        // 监听搜索操作
+        form.on('submit(data-search-btn)', function (data) {
+            let cityName = $("#cityName").val();
+            //执行搜索重载
+            table.reload('weatherTable', {
+                where: {
+                    city: cityName
+                }
+            });
+            return false;
+        });
+    });
+
+
+    /**
+     *  name layuiRowspan
+     * @param fieldName  要合并列的field属性值
+     * @param index 要合并列的索引值 从1开始(如果要合并第一列，则index = 1;)
+     * @desc 此方法适用于合并列冻结的单元格
+     */
+    function layuiRowspan(fieldName, index) {
+        // 左侧列为冻结的情况
+        var tbodyNode = document.getElementsByClassName("layui-table-fixed-l")[index - 1];
+        var child = tbodyNode.getElementsByTagName("td");
+        var childFilterArr = [];
+        // 获取data-field属性为fieldName的td
+        for (var i = 0; i < child.length; i++) {
+            if (child[i].getAttribute("data-field") == fieldName) {
+                childFilterArr.push(child[i]);
+            }
+        }
+        // 获取td的个数和种类
+        var childFilterTextObj = {};
+        for (var i = 0; i < childFilterArr.length; i++) {
+            var childText = childFilterArr[i].textContent;
+            if (childFilterTextObj[childText] == undefined) {
+                childFilterTextObj[childText] = 1;
+            } else {
+                var num = childFilterTextObj[childText];
+                childFilterTextObj[childText] = num * 1 + 1;
+            }
+        }
+        // 给获取到的td设置合并单元格属性
+        for (var key in childFilterTextObj) {
+            var tdNum = childFilterTextObj[key];
+            var canRowspan = true;
+            for (var i = 0; i < childFilterArr.length; i++) {
+                if (childFilterArr[i].getAttribute("data-content") == key) {
+                    if (canRowspan) {
+                        childFilterArr[i].setAttribute("rowspan", tdNum);
+                        canRowspan = false;
+                    } else {
+                        childFilterArr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * name layui合并tbody中单元格的方法
+     * @param fieldName  要合并列的field属性值
+     * @param index 表格的索引值 从1开始
+     * @desc 此方式适用于没有列冻结的单元格合并
+     */
+    function alarmTableRowSpan(fieldName, index) {
+        var fixedNode = document.getElementsByClassName("layui-table-body")[index - 1];
+        if (!fixedNode) {
+            return false;
+        }
+        var child = fixedNode.getElementsByTagName("td");
+        var childFilterArr = [];
+        // 获取data-field属性为fieldName的td
+        for (var i = 0; i < child.length; i++) {
+            if (child[i].getAttribute("data-field") == fieldName) {
+                childFilterArr.push(child[i]);
+            }
+        }
+        // 获取td的个数和种类
+        var childFilterTextObj = {};
+        for (var i = 0; i < childFilterArr.length; i++) {
+            var childText = childFilterArr[i].textContent;
+            if (childFilterTextObj[childText] == undefined) {
+                childFilterTextObj[childText] = 1;
+            } else {
+                var num = childFilterTextObj[childText];
+                childFilterTextObj[childText] = num * 1 + 1;
+            }
+        }
+        // 给获取到的td设置合并单元格属性
+        for (var key in childFilterTextObj) {
+            var tdNum = childFilterTextObj[key];
+            var canRowSpan = true;
+            for (var i = 0; i < childFilterArr.length; i++) {
+                if (childFilterArr[i].textContent == key) {
+                    if (canRowSpan) {
+                        childFilterArr[i].setAttribute("rowspan", tdNum);
+                        canRowSpan = false;
+                    } else {
+                        childFilterArr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+    }
+</script>
+
+</body>
+</html>

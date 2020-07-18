@@ -1,0 +1,55 @@
+{
+  "homeInfo": {
+    "title": "首页",
+    "href": "welcome-1.html?t=1"
+  },
+  "logoInfo": {
+    "title": "Lowi",
+    "image": "cssjs/images/logo.png",
+    "href": ""
+  },
+  "menuInfo": [
+    {
+      "title": "常规管理",
+      "icon": "fa fa-address-book",
+      "href": "",
+      "target": "_self",
+      "child": [
+        {
+          "title": "主页模板",
+          "href": "",
+          "icon": "fa fa-home",
+          "target": "_self",
+          "child": [
+            {
+              "title": "表格示例",
+              "href": "user/table.html",
+              "icon": "fa fa-file-text",
+              "target": "_self"
+            }
+          ]
+        },
+        {
+          "title": "天气",
+          "href": "weather/weather.html",
+          "icon": "fa fa-window-maximize",
+          "target": "_self"
+        },
+        {
+          "title": "用户信息",
+          "href": "",
+          "icon": "fa fa-window-maximize",
+          "target": "_self",
+          "child": [
+            {
+              "title": "登录日志",
+              "href": "user/loginLog.html",
+              "icon": "fa fa-file-text",
+              "target": "_self"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

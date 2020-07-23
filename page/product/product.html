@@ -62,6 +62,7 @@
         <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
 
         <script type="text/html" id="currentTableBar">
+            <input type="checkbox" checked="" name="open" lay-skin="switch" lay-filter="switchTest" title="开关">
             <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="edit">编辑</a>
             <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
         </script>
@@ -82,21 +83,32 @@
         table.render({
             elem: '#currentTableId',
             id: "tableList",
-            url: $api + 'user/getUserList?token='+token,
+            url: $api + 'product/getProductList?token='+token,
             toolbar: '#toolbarDemo',
             defaultToolbar: ['filter', 'exports', 'print', {
                 title: '提示',
                 layEvent: 'LAYTABLE_TIPS',
                 icon: 'layui-icon-tips'
             }],
+            parseData:function(res){
+                if(res.code == 0){
+                    console.log(res.data);
+                    var resData = res.data;
+                    for (let i = 0; i < resData.length; i++) {
+                        resData[i].price = resData[i].price + resData[i].priceUnit+"/"+resData[i].unit;
+                    }
+                }
+            },
             cols: [
                 [
                     {type: "checkbox", width: 50},
                     {field: 'id', title: 'ID', sort: true},
-                    {field: 'username', title: '用户名'},
-                    {field: 'sexStr', title: '性别', sort: true},
-                    {field: 'mobile', title: '手机'},
-                    {field: 'email', title: '邮箱'},
+                    {field: 'productName', title: '产品名称'},
+                    {field: 'twoCategoryStr', title: '分类名称'},
+                    {field: 'total', title: '数量'},
+                    {field: 'unit', title: '单位'},
+                    {field: 'productContent', title: '描述'},
+                    {field: 'price', title: '价格'},
                     {title: '操作', minWidth: 150, toolbar: '#currentTableBar', align: "center"}
                 ]
             ],
@@ -130,13 +142,13 @@
         table.on('toolbar(currentTableFilter)', function (obj) {
             if (obj.event === 'add') {  // 监听添加操作
                 var index = layer.open({
-                    title: '添加用户',
+                    title: '新增产品',
                     type: 2,
                     shade: 0.2,
                     maxmin: true,
                     shadeClose: true,
                     area: ['100%', '100%'],
-                    content: 'openAccount.html',
+                    content: 'addProduct.html',
                 });
                 $(window).on("resize", function () {
                     layer.full(index);

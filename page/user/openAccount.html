@@ -110,6 +110,7 @@
                     if(data.code == 0){
                         console.log(data);
                         layer.msg(data.msg);
+                        setTimeout(close('yes'), 2000);
                     }else {
                         layer.msg(data.msg);
                     }
@@ -117,6 +118,16 @@
             })
             return false;
         });
+
+        function close(status){
+            if(status=="yes"){
+                window.parent.location.reload();//刷新父页面
+                var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+                parent.layer.close(index);
+            }
+            var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+            parent.layer.close(index);
+        }
     });
 </script>
 

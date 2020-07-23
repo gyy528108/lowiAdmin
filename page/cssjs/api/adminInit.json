@@ -52,11 +52,19 @@
               "href": "user/userList.html",
               "icon": "fa fa-file-text",
               "target": "_self"
-            },
+            }
+          ]
+        },
+        {
+          "title": "产品信息",
+          "href": "",
+          "icon": "fa fa-imdb",
+          "target": "_self",
+          "child": [
             {
-              "title": "用户开户",
-              "href": "user/openAccount.html",
-              "icon": "fa fa-file-text",
+              "title": "产品列表",
+              "href": "product/product.html",
+              "icon": "fa fa-meetup",
               "target": "_self"
             }
           ]

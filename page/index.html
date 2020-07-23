@@ -158,7 +158,7 @@
             var iniUrl = "";
             $.ajax({
                 type: "post",
-                url: $api+"/user/pageInit",
+                url: $api+"user/pageInit",
                 async: false,//同步提交。不设置则默认异步，异步的话，最后执行ajax
                 contentType: "application/json",
                 data:JSON.stringify(param),
@@ -202,7 +202,7 @@
                     param.token = token;
                     $.ajax({
                         type: "post",
-                        url: $api+"/user/logout",
+                        url: $api+"user/logout",
                         async: false,//同步提交。不设置则默认异步，异步的话，最后执行ajax
                         contentType: "application/json",
                         data:JSON.stringify(param),

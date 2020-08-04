@@ -55,7 +55,7 @@
         <script type="text/html" id="toolbarDemo">
             <div class="layui-btn-container">
                 <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add"> 添加</button>
-                <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="delete"> 删除</button>
+                <!--<button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="delete"> 删除</button>-->
             </div>
         </script>
 
@@ -142,8 +142,12 @@
                     layer.full(index);
                 });
             } else if (obj.event === 'delete') {  // 监听删除操作
+                console.log(obj,"------obj------------");
                 var checkStatus = table.checkStatus('currentTableId')
                     , data = checkStatus.data;
+                console.log(checkStatus,"------checkStatus------------");
+                console.log(data,"------data------------");
+
                 layer.alert(JSON.stringify(data));
             }
         });
@@ -172,6 +176,7 @@
                 return false;
             } else if (obj.event === 'delete') {
                 layer.confirm('真的删除此用户么?', function (index) {
+                    console.log(data,"------data------------");
                     obj.del();
                     layer.close(index);
                 });

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../cssjs/lib/layui-v2.5.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="../cssjs/css/public.css" media="all">
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+        <blockquote class="layui-elem-quote layui-text">
+            产品详情
+        </blockquote>
+        <form class="layui-form layui-form-pane" action="">
+            <div class="layui-form-item">
+                <label class="layui-form-label">产品名称</label>
+                <div class="layui-input-block">
+                    <input type="text" id="productName" disabled autocomplete="off"
+                           placeholder="请输入产品名称" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-upload">
+                <div class="layui-upload-list">
+                    <img class="layui-upload-img" width="200px" height="200px" id="imgUrl">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">产品分类</label>
+                <div class="layui-input-inline">
+                    <select name="oneCategory"  id="oneCategory" lay-search=""
+                            lay-filter="oneChange">
+                    </select>
+                </div>
+                <div class="layui-input-inline">
+                    <select name="twoCategory"  id="twoCategory" lay-search="">
+                        <option value="">请选择二级分类</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">数量</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="count" disabled placeholder="请输入数量" autocomplete="off"
+                           class="layui-input">
+                </div>
+                <div class="layui-input-inline">
+                    <input type="text" id="unit" disabled placeholder="请输入单位" autocomplete="off"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">价格</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="price" disabled placeholder="请输入价格" autocomplete="off"
+                           class="layui-input">
+                </div>
+                <div class="layui-input-inline">
+                    <input type="text" id="priceUnit" disabled placeholder="请输入单位" autocomplete="off"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">文本域</label>
+                <div class="layui-input-block">
+                    <textarea id="context" disabled placeholder="请输入内容" class="layui-textarea"></textarea>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="../cssjs/lib/jquery-3.4.1/jquery-3.4.1.min.js" charset="utf-8"></script>
+<script src="../cssjs/lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+<script src="../cssjs/api/http.js" charset="utf-8"></script>
+<script src="../cssjs/loginJs/loginJS.js" charset="utf-8"></script>
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+<script>
+    var parentJson;
+    $(function () {
+        //从父层获取值，json是父层的全局js变量。eval是将该string类型的json串变为标准的json串
+        parentJson = eval('(' + parent.json + ')');
+        $("#productName").val(parentJson.productName);
+        $("#imgUrl").attr("src", parentJson.img);
+        layui.use(['form'], function () {
+            var form = layui.form;
+            $("#oneCategory").empty();
+            $("#oneCategory").append("<option value='" + parentJson.oneCategory + "'>" + parentJson.oneCategoryStr + "</option>");
+            $("#twoCategory").empty();
+            $("#twoCategory").append("<option value='" + parentJson.twoCategory + "'>" + parentJson.twoCategoryStr + "</option>");
+            form.render('select');
+        });
+        $("#count").val(parentJson.total);
+        $("#unit").val(parentJson.unit);
+        $("#price").val(parentJson.price);
+        $("#priceUnit").val(parentJson.priceUnit);
+        $("#context").val(parentJson.productContent);
+        console.log(parentJson);
+    });
+</script>
+
+</body>
+</html>

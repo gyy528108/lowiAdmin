@@ -55,14 +55,14 @@
         <script type="text/html" id="toolbarDemo">
             <div class="layui-btn-container">
                 <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add"> 添加</button>
-                <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="delete"> 删除</button>
+                <!--<button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="delete"> 删除</button>-->
             </div>
         </script>
 
         <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
 
         <script type="text/html" id="currentTableBar">
-            <input type="checkbox" checked="" name="open" lay-skin="switch" lay-filter="switchTest" title="开关">
+            <a class="layui-btn layui-btn-checked layui-btn-xs data-count-select" lay-event="select">查看</a>
             <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="edit">编辑</a>
             <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
         </script>
@@ -74,6 +74,7 @@
 <script src="../cssjs/api/http.js" charset="utf-8"></script>
 <script src="../cssjs/loginJs/loginJS.js" charset="utf-8"></script>
 <script>
+    var json;
     layui.use(['form', 'table'], function () {
         loginValida();
         var token = LocalData.getData("token");
@@ -95,7 +96,7 @@
                     console.log(res.data);
                     var resData = res.data;
                     for (let i = 0; i < resData.length; i++) {
-                        resData[i].price = resData[i].price + resData[i].priceUnit+"/"+resData[i].unit;
+                        resData[i].priceStr = resData[i].price + resData[i].priceUnit+"/"+resData[i].unit;
                     }
                 }
             },
@@ -103,12 +104,13 @@
                 [
                     {type: "checkbox", width: 50},
                     {field: 'id', title: 'ID', sort: true},
+                    {field: 'img', title: '图片',width: 130 , align: 'center',templet:'<div><img style="height:100%;" src="{{d.img}}"></div>'},
                     {field: 'productName', title: '产品名称'},
                     {field: 'twoCategoryStr', title: '分类名称'},
                     {field: 'total', title: '数量'},
                     {field: 'unit', title: '单位'},
                     {field: 'productContent', title: '描述'},
-                    {field: 'price', title: '价格'},
+                    {field: 'priceStr', title: '价格'},
                     {title: '操作', minWidth: 150, toolbar: '#currentTableBar', align: "center"}
                 ]
             ],
@@ -167,16 +169,16 @@
 
         table.on('tool(currentTableFilter)', function (obj) {
             var data = obj.data;
+            json = JSON.stringify(data);
             if (obj.event === 'edit') {
-
                 var index = layer.open({
-                    title: '编辑用户',
+                    title: '编辑产品',
                     type: 2,
                     shade: 0.2,
                     maxmin: true,
                     shadeClose: true,
                     area: ['100%', '100%'],
-                    content: '../page/table/edit.html',
+                    content: 'editProduct.html',
                 });
                 $(window).on("resize", function () {
                     layer.full(index);
@@ -186,6 +188,16 @@
                 layer.confirm('真的删除此用户么?', function (index) {
                     obj.del();
                     layer.close(index);
+                });
+            }else if(obj.event === 'select'){
+                var index = layer.open({
+                    title: '查看产品详情',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin: true,
+                    shadeClose: true,
+                    area: ['100%', '100%'],
+                    content: 'productInfo.html',
                 });
             }
         });

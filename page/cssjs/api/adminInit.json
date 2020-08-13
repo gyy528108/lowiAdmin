@@ -68,6 +68,20 @@
               "target": "_self"
             }
           ]
+        },
+        {
+          "title": "订单信息",
+          "href": "",
+          "icon": "fa fa-imdb",
+          "target": "_self",
+          "child": [
+            {
+              "title": "订单列表",
+              "href": "order/orderList.html",
+              "icon": "fa fa-meetup",
+              "target": "_self"
+            }
+          ]
         }
       ]
     }

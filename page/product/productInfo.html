@@ -70,6 +70,9 @@
                 </div>
             </div>
         </form>
+        <div class="layui-form-item" id="payDiv">
+            <button class="layui-btn" lay-submit="" lay-filter="addProduct">购买</button>
+        </div>
     </div>
 </div>
 <script src="../cssjs/lib/jquery-3.4.1/jquery-3.4.1.min.js" charset="utf-8"></script>
@@ -84,6 +87,10 @@
         parentJson = eval('(' + parent.json + ')');
         $("#productName").val(parentJson.productName);
         $("#imgUrl").attr("src", parentJson.img);
+
+        if(parentJson.total === 0){
+            $("#payDiv").hidden;
+        }
         layui.use(['form'], function () {
             var form = layui.form;
             $("#oneCategory").empty();
@@ -98,6 +105,37 @@
         $("#priceUnit").val(parentJson.priceUnit);
         $("#context").val(parentJson.productContent);
         console.log(parentJson);
+
+        layui.use(['form'], function () {
+            loginValida();
+            var form = layui.form;
+            var token = LocalData.getData("token");
+            //监听提交
+            form.on('submit(addProduct)', function (data) {
+                var param = {};
+                param.token = token;
+                param.productId = parentJson.id;
+                $.ajax({
+                    url: $api + 'order/submitOrder',
+                    type: 'post',
+                    dataType: 'json',
+                    async: false,//同步提交。不设置则默认异步，异步的话，最后执行ajax
+                    contentType: 'application/json',
+                    data: JSON.stringify(param),
+                    success: function (data) {
+                        if (data.code == 0) {
+                            console.log(data);
+                            layer.msg(data.msg);
+                            setTimeout(close('yes'), 2000);
+                            window.location = '../order/orderList.html';
+                        } else {
+                            layer.msg(data.msg);
+                        }
+                    }
+                });
+                return false;
+            });
+        });
     });
 </script>
 

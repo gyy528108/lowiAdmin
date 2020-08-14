@@ -76,7 +76,7 @@
         table.render({
             elem: '#currentTableId',
             id: "tableList",
-            url: $api + 'product/getProductList?token='+token,
+            url: $api + 'order/getOrderList?token='+token,
             toolbar: '#toolbarDemo',
             defaultToolbar: ['filter', 'exports', 'print', {
                 title: '提示',
@@ -98,19 +98,19 @@
             cols: [
                 [
                     {type: "checkbox", width: 50},
-                    {field: 'id', title: 'ID', sort: true},
-                    {field: 'img', title: '图片',width: 130 , align: 'center',templet:'<div><img style="height:100%;" src="{{d.img}}"></div>'},
+                    {field: 'orderNo', title: '订单号'},
+                    {field: 'productId', title: '产品id',hide:true},
                     {field: 'productName', title: '产品名称'},
-                    {field: 'twoCategoryStr', title: '分类名称'},
-                    {field: 'total', title: '剩余数量'},
-                    {field: 'unit', title: '单位'},
-                    {field: 'productContent', title: '描述'},
-                    {field: 'priceStr', title: '价格'},
+                    {field: 'price', title: '价格'},
+                    {field: 'priceUnit', title: '单位'},
+                    {field: 'status', title: '状态',hide:true},
+                    {field: 'statusStr', title: '订单状态'},
+                    {field: 'createTime', title: '创建时间'},
                     {title: '操作', minWidth: 150, toolbar: '#currentTableBar', align: "center"}
                 ]
             ],
             limits: [10, 15, 20, 25, 50, 100],
-            limit: 15,
+            limit: 10,
             page: true,
             skin: 'line'
         });

@@ -88,8 +88,8 @@
         $("#productName").val(parentJson.productName);
         $("#imgUrl").attr("src", parentJson.img);
 
-        if(parentJson.total === 0){
-            $("#payDiv").hidden;
+        if(parentJson.total === "已售罄"){
+            $("#payDiv").hide();
         }
         layui.use(['form'], function () {
             var form = layui.form;

@@ -120,31 +120,31 @@
 <script src="cssjs/js/lay-config.js?v=2.0.0" charset="utf-8"></script>
 <script src="cssjs/api/http.js" charset="utf-8"></script>
 <script src="cssjs/loginJs/loginJS.js" charset="utf-8"></script>
-<!--看板娘 - 猫-->
-<script src="https://eqcn.ajz.miesnfu.com/wp-content/plugins/wp-3d-pony/live2dw/lib/L2Dwidget.min.js"></script>
-<script>
-    L2Dwidget.init({
-        "model": {
-            jsonPath: "https://unpkg.com/live2d-widget-model-hijiki/assets/hijiki.model.json",<!--这里改模型，前面后面都要改-->
-            "scale": 1
-        },
-        "display": {
-            "position": "right",<!--设置看板娘的上下左右位置-->
-            "width": 100,
-            "height": 200,
-            "hOffset": 70,
-            "vOffset": 0
-        },
-        "mobile": {
-            "show": true,
-            "scale": 0.5
-        },
-        "react": {
-            "opacityDefault": 0.7,<!--设置透明度-->
-            "opacityOnHover": 0.2
-        }
-    });
-</script>
+<!--&lt;!&ndash;看板娘 - 猫&ndash;&gt;-->
+<!--<script src="https://eqcn.ajz.miesnfu.com/wp-content/plugins/wp-3d-pony/live2dw/lib/L2Dwidget.min.js"></script>-->
+<!--<script>-->
+<!--L2Dwidget.init({-->
+<!--"model": {-->
+<!--jsonPath: "https://unpkg.com/live2d-widget-model-hijiki/assets/hijiki.model.json",&lt;!&ndash;这里改模型，前面后面都要改&ndash;&gt;-->
+<!--"scale": 1-->
+<!--},-->
+<!--"display": {-->
+<!--"position": "right",&lt;!&ndash;设置看板娘的上下左右位置&ndash;&gt;-->
+<!--"width": 100,-->
+<!--"height": 200,-->
+<!--"hOffset": 70,-->
+<!--"vOffset": 0-->
+<!--},-->
+<!--"mobile": {-->
+<!--"show": true,-->
+<!--"scale": 0.5-->
+<!--},-->
+<!--"react": {-->
+<!--"opacityDefault": 0.7,&lt;!&ndash;设置透明度&ndash;&gt;-->
+<!--"opacityOnHover": 0.2-->
+<!--}-->
+<!--});-->
+<!--</script>-->
 <script>
     $(function () {
         loginValida();
@@ -158,25 +158,26 @@
             var iniUrl = "";
             $.ajax({
                 type: "post",
-                url: $api+"user/pageInit",
+                url: $api + "user/pageInit",
                 async: false,//同步提交。不设置则默认异步，异步的话，最后执行ajax
                 contentType: "application/json",
-                data:JSON.stringify(param),
+                data: JSON.stringify(param),
                 dataType: 'json',
                 success: function (data) {
                     if (data.code == 0) {
-                        var initUrl = "";
-                        if(data.data.admin == true){
-                            initUrl = "cssjs/api/adminInit.json";
-                        }else {
-                            initUrl = "cssjs/api/init.json"
-                        }
-                        $.getJSON(initUrl,function (initData,status) {
-                            initJson = initData;
-                            initJson.logoInfo.title = data.data.name;
-                            initJson.logoInfo.image = data.data.headImg;
-                            document.getElementById("userName").innerHTML = data.data.name;
-                        });
+                        // var initUrl = "";
+                        // if(data.data.admin == true){
+                        //     initUrl = "cssjs/api/adminInit.json";
+                        // }else {
+                        //     initUrl = "cssjs/api/init.json"
+                        // }
+                        // $.getJSON(initUrl,function (initData,status) {
+                        //     initJson = initData;
+                        //     initJson.logoInfo.title = data.data.name;
+                        //     initJson.logoInfo.image = data.data.headImg;
+                        //     document.getElementById("userName").innerHTML = data.data.name;
+                        // });
+                        initJson = data.data;
                     }
                 }
             });
@@ -204,10 +205,10 @@
                     param.token = token;
                     $.ajax({
                         type: "post",
-                        url: $api+"user/logout",
+                        url: $api + "user/logout",
                         async: false,//同步提交。不设置则默认异步，异步的话，最后执行ajax
                         contentType: "application/json",
-                        data:JSON.stringify(param),
+                        data: JSON.stringify(param),
                         dataType: 'json',
                         success: function (data) {
                             console.log("data:" + data)

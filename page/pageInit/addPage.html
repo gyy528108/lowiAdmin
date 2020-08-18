@@ -1,10 +1,177 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
+    <meta charset="utf-8">
+    <title>layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../cssjs/lib/layui-v2.5.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="../cssjs/css/public.css" media="all">
+    <link rel="stylesheet" href="../cssjs/lib/font-awesome-4.7.0/css/font-awesome.min.css" media="all">
+
 </head>
 <body>
-$END$
+<div class="layuimini-container">
+    <div class="layuimini-main">
+        <blockquote class="layui-elem-quote layui-text">
+            增加页面
+        </blockquote>
+        <form class="layui-form" action="">
+            <div class="layui-form-item">
+                <label class="layui-form-label">页面名称</label>
+                <div class="layui-input-block">
+                    <input type="text" name="pageName" lay-verify="pageName" autocomplete="off"
+                           placeholder="请输入页面名称" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">只能超级管理员查看</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="superAdmin" value="1" title="是" checked="">
+                    <input type="radio" name="superAdmin" value="0" title="否" >
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">只能管理员查看</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="isAdmin" value="1" title="是" checked="">
+                    <input type="radio" name="isAdmin" value="0" title="否" >
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">父目录</label>
+                <div class="layui-input-inline">
+                    <select name="oneLevel" id="oneLevel">
+                        <option value="0">常规管理</option>
+                    </select>
+                </div>
+                <div class="layui-input-inline">
+                    <select name="twoLevel" id="twoLevel" lay-search="">
+                        <option value="">请选择二级目录</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">页面位置</label>
+                <div class="layui-input-block">
+                    <input type="text" name="href"  autocomplete="off"
+                           placeholder="请输入页面位置" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">icon图标</label>
+                <div class="layui-input-inline">
+                    <select name="iconSel" lay-verify="icon" id="iconSel" lay-search="" lay-filter="iconSel">
+                        <option value="">请选择icon图标</option>
+                    </select>
+                </div>
+                <div class="layui-input-inline">
+                    <i id="iconStyle"></i>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <button class="layui-btn" lay-submit="" lay-filter="addPage">提交</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="../cssjs/lib/jquery-3.4.1/jquery-3.4.1.min.js" charset="utf-8"></script>
+<script src="../cssjs/lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+<script src="../cssjs/api/http.js" charset="utf-8"></script>
+<script src="../cssjs/loginJs/loginJS.js" charset="utf-8"></script>
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+<script>
+    layui.use(['form', 'layedit', 'laydate'], function () {
+        loginValida();
+        var form = layui.form,
+            layer = layui.layer,
+            upload = layui.upload
+        ;
+        var token = LocalData.getData("token");
+        $(function () {
+            console.log("进入就调用");
+            getAllIcon();
+        });
+        //自定义验证规则
+        form.verify({
+            pageName: function (value) {
+                if (value.length > 48 || value.length < 1) {
+                    return '页面名称至少得1个字符，最大16个字符';
+                }
+            }
+            , icon: function (value) {
+                if (value.length < 1) {
+                    return '请选择icon图标';
+                }
+            }
+        });
+        //监听提交
+        form.on('submit(addProduct)', function (data) {
+            var token = LocalData.getData("token");
+            var param = data.field;
+            param.token = token;
+            $.ajax({
+                url: $api + 'product/add',
+                type: 'post',
+                dataType: 'json',
+                async: false,//同步提交。不设置则默认异步，异步的话，最后执行ajax
+                contentType: 'application/json',
+                data: JSON.stringify(param),
+                success: function (data) {
+                    if (data.code == 0) {
+                        console.log(data);
+                        layer.msg(data.msg);
+                        setTimeout(close('yes'), 2000);
+                    } else {
+                        layer.msg(data.msg);
+                    }
+                }
+            });
+            return false;
+        });
+        function getAllIcon() {
+            var param = {};
+            param.token = token;
+            $.ajax({
+                url: $api + 'userPage/getAllIcon?token='+token,
+                type: 'post',
+                dataType: 'json',
+                data: JSON.stringify(param),
+                async: false,//同步提交。不设置则默认异步，异步的话，最后执行ajax
+                contentType: 'application/json',
+                success: function (data) {
+                    if (data.code == 0) {
+                        var resData = data.data;
+                        console.log(resData,"------------------");
+                        $("#iconSel").empty();
+                        $("#iconSel").append("<option value=''>请选择icon图标</option>");
+                        for (let i = 0; i < resData.length; i++) {
+                            $("#iconSel").append("<option value='" + resData[i] + "'>"+ resData[i] + "</option>");
+                        }
+                        form.render('select');
+                    }
+                }
+            })
+        }
+
+        form.on('select(iconSel)', function (data) { //no是那个lay-filter的值
+            var id = $("#iconSel").val();
+            console.log("icon",id);
+            $("#iconStyle").attr("class",id);
+        });
+
+        function close(status) {
+            if (status == "yes") {
+                window.parent.location.reload();//刷新父页面
+                var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+                parent.layer.close(index);
+            }
+            var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+            parent.layer.close(index);
+        }
+    });
+</script>
+
 </body>
 </html>

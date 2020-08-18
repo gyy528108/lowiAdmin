@@ -2,9 +2,158 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>$Title$</title>
+    <link rel="stylesheet" href="../cssjs/lib/layui-v2.5.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="../cssjs/css/public.css" media="all">
+    <link rel="stylesheet" href="../cssjs/css/demo.css">
+    <style>
+        .demo-side {
+            position: relative;
+            transition: all .3s;
+        }
+
+        .demo-side.show {
+            padding-left: 120px;
+            position: relative;
+        }
+
+        .demo-side:before {
+            content: "假设这是侧边栏, treeTable使用了与layui数据表格完全不同的列宽分配方式, 由浏览器来分配, 所以当容器宽度变化后会自动适应, 对单页面系统非常友好";
+            position: absolute;
+            left: 0;
+            top: 50%;
+            margin-top: -90px;
+            width: 105px;
+            visibility: hidden;
+            line-height: 1.5;
+        }
+
+        .demo-side.show:before {
+            visibility: visible;
+        }
+    </style>
 </head>
-<body>
-$END$
+<body class="layui-hide">
+<div class="layui-btn-container" style="display: inline-block;">
+    <button id="btnExpandAll" class="layui-btn layui-btn-sm layui-btn-primary">
+        <i class="layui-icon">&#xe668;</i>展开全部
+    </button>
+    <button id="btnFoldAll" class="layui-btn layui-btn-sm layui-btn-primary">
+        <i class="layui-icon">&#xe66b;</i>折叠全部
+    </button>
+</div>
+<div>
+    <blockquote class="layui-elem-quote" style="margin: 15px 0;">页面管理</blockquote>
+    <div class="demo-side">
+        <table id="demoTreeTb"></table>
+    </div>
+</div>
+<!-- 表格操作列 -->
+<script type="text/html" id="tbBar">
+    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="edit">修改权限</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除页面</a>
+</script>
+
+<script src="../cssjs/lib/jquery-3.4.1/jquery-3.4.1.min.js" charset="utf-8"></script>
+<script src="../cssjs/lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+<script src="../cssjs/js/lay-config.js" charset="utf-8"></script>
+<script src="../cssjs/api/http.js" charset="utf-8"></script>
+<script src="../cssjs/loginJs/loginJS.js" charset="utf-8"></script>
+<script>
+    layui.use(['layer', 'util', 'treeTable'], function () {
+
+        loginValida();
+        var token = LocalData.getData("token");
+        var $ = layui.jquery;
+        var layer = layui.layer;
+        var treeTable = layui.treeTable;
+        $('body').removeClass('layui-hide');
+
+        // 渲染表格
+        var insTb = treeTable.render({
+            elem: '#demoTreeTb',
+            url: $api+"userPage/getAllPage?token="+token,
+            toolbar: 'default',
+            height: 'full-200',
+            tree: {
+                iconIndex: 2,
+                isPidData: true,
+                idName: 'authorityId',
+                pidName: 'parentId'
+            },
+            cols: [
+                [
+                    {type: 'numbers'},
+                    {type: 'checkbox'},
+                    {field: 'authorityName', title: '菜单名称'},
+                    {field: 'menuUrl', title: '页面位置'},
+                    {field: 'admin', title: '是否只能管理员查看'},
+                    {field: 'superAdmin', title: '是否只能超级管理员查看'},
+                    {align: 'center', toolbar: '#tbBar', title: '操作'}
+                ]
+            ],
+            style: 'margin-top:0;'
+        });
+
+        // 工具列点击事件
+        treeTable.on('tool(demoTreeTb)', function (obj) {
+            var data = obj.data;
+            json = JSON.stringify(data);
+            var event = obj.event;
+            if (event === 'del') {
+                layer.msg('删除成功');
+                obj.del();
+            } else if (event === 'edit') {
+                layer.open({
+                    title: '编辑页面',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin: true,
+                    shadeClose: true,
+                    area: ['100%', '100%'],
+                    content: 'editPage.html',
+                });
+            }
+        });
+
+        // 头部工具栏点击事件
+        treeTable.on('toolbar(demoTreeTb)', function (obj) {
+            switch (obj.event) {
+                case 'add':
+                    var index = layer.open({
+                        title: '新增页面',
+                        type: 2,
+                        shade: 0.2,
+                        maxmin: true,
+                        shadeClose: true,
+                        area: ['100%', '100%'],
+                        content: 'addPage.html',
+                    });
+                    $(window).on("resize", function () {
+                        layer.full(index);
+                    });
+                    break;
+                case 'delete':
+                    layer.msg('删除');
+                    break;
+                case 'update':
+                    layer.msg('编辑');
+                    break;
+                case 'LAYTABLE_TIPS':
+                    layer.msg('提示');
+                    break;
+            }
+        });
+
+        // 全部展开
+        $('#btnExpandAll').click(function () {
+            insTb.expandAll();
+        });
+
+        // 全部折叠
+        $('#btnFoldAll').click(function () {
+            insTb.foldAll();
+        });
+    });
+</script>
 </body>
 </html>

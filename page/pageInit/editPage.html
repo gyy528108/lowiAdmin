@@ -28,15 +28,15 @@
             <div class="layui-form-item">
                 <label class="layui-form-label">只能超级管理员查看</label>
                 <div class="layui-input-block">
-                    <input type="radio" name="superAdmin" value="1" title="是" checked="">
-                    <input type="radio" name="superAdmin" value="0" title="否">
+                    <input type="radio" name="isSuperAdmin" value="true" title="是" checked="">
+                    <input type="radio" name="isSuperAdmin" value="false" title="否">
                 </div>
             </div>
             <div class="layui-form-item">
                 <label class="layui-form-label">只能管理员查看</label>
                 <div class="layui-input-block">
-                    <input type="radio" name="isAdmin" value="1" title="是" checked="">
-                    <input type="radio" name="isAdmin" value="0" title="否">
+                    <input type="radio" name="isAdmin" value="true" title="是" checked="">
+                    <input type="radio" name="isAdmin" value="false" title="否">
                 </div>
             </div>
             <div class="layui-form-item">
@@ -62,7 +62,7 @@
             <div class="layui-form-item">
                 <label class="layui-form-label">icon图标</label>
                 <div class="layui-input-inline">
-                    <select name="iconSel" lay-verify="icon" id="iconSel" lay-search="" lay-filter="iconSel">
+                    <select name="iconSel" lay-verify="iconSel" id="iconSel" lay-search="" lay-filter="iconSel">
                         <option value="">请选择icon图标</option>
                     </select>
                 </div>
@@ -71,7 +71,7 @@
                 </div>
             </div>
             <div class="layui-form-item">
-                <button class="layui-btn" lay-submit="" lay-filter="addPage">提交</button>
+                <button class="layui-btn" lay-submit="" lay-filter="editPage">提交</button>
             </div>
         </form>
     </div>
@@ -89,6 +89,16 @@
         $("#pageName").val(parentJson.authorityName);
         $("#href").val(parentJson.menuUrl);
         $("#iconStyle").attr("class", parentJson.menuIcon);
+        if(parentJson.superAdmin){
+            $("input[name=isSuperAdmin][value=true]").prop("checked","true");
+        }else {
+            $("input[name=isSuperAdmin][value=false]").prop("checked","true");
+        }
+         if(parentJson.admin){
+            $("input[name=isAdmin][value=true]").prop("checked","true");
+        }else {
+            $("input[name=isAdmin][value=false]").prop("checked","true");
+        }
     });
     layui.use(['form', 'layedit', 'laydate'], function () {
         loginValida();
@@ -109,19 +119,33 @@
                     return '页面名称至少得1个字符，最大16个字符';
                 }
             }
-            , icon: function (value) {
+            , iconSel: function (value) {
                 if (value.length < 1) {
                     return '请选择icon图标';
                 }
             }
         });
         //监听提交
-        form.on('submit(addProduct)', function (data) {
+        form.on('submit(editPage)', function (data) {
             var token = LocalData.getData("token");
-            var param = data.field;
+            var param = {};
+            if(data.field.iconSel){
+
+            }
             param.token = token;
+            param.icon = data.field.iconSel;
+            param.id = parentJson.authorityId;
+            param.title = data.field.pageName;
+            param.isSuperAdmin = data.field.isSuperAdmin;
+            param.isAdmin = data.field.isAdmin;
+            if(data.field.twoLevel){
+                param.parentId = data.field.twoLevel;
+            }else {
+                param.parentId =1;
+            }
+           console.log(param,"--------------------");
             $.ajax({
-                url: $api + 'product/add',
+                url: $api + 'userPage/editUserPage',
                 type: 'post',
                 dataType: 'json',
                 async: false,//同步提交。不设置则默认异步，异步的话，最后执行ajax
@@ -181,26 +205,18 @@
                 success: function (data) {
                     if (data.code == 0) {
                         var resData = data.data;
-                        console.log(resData, "------------------");
                         $("#twoLevel").empty();
                         $("#twoLevel").append("<option value=''>请选择二级目录</option>");
 
                         for (var prop in resData) {
                             if (resData.hasOwnProperty(prop)) {
-                                if (parentJson.parentId === prop) {
+                                if (parentJson.parentId == prop) {
                                     $("#twoLevel").append("<option value='" + prop + "' selected>" + resData[prop] + "</option>");
                                 } else {
                                     $("#twoLevel").append("<option value='" + prop + "'>" + resData[prop] + "</option>");
                                 }
                             }
                         }
-                        // for (let i = 0; i < resData.length; i++) {
-                        //     if(parentJson.menuIcon === resData[i]){
-                        //         $("#iconSel").append("<option value='" + resData[i] + "' selected>" + resData[i] + "</option>");
-                        //     }else {
-                        //         $("#iconSel").append("<option value='" + resData[i] + "'>" + resData[i] + "</option>");
-                        //     }
-                        // }
                         form.render('select');
                     }
                 }
